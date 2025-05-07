@@ -10726,6 +10726,10 @@ process.nextTick = (function () {
         var queue = [];
         window.addEventListener('message', function (ev) {
             var source = ev.source;
+            // Only process messages from the same origin
+            if (ev.origin !== window.location.origin) {
+                return;
+            }
             if ((source === window || source === null) && ev.data === 'process-tick') {
                 ev.stopPropagation();
                 if (queue.length > 0) {
@@ -10737,7 +10741,7 @@ process.nextTick = (function () {
 
         return function nextTick(fn) {
             queue.push(fn);
-            window.postMessage('process-tick', '*');
+            window.postMessage('process-tick', window.location.origin);
         };
     }
 
